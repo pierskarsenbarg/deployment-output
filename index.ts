@@ -44,4 +44,4 @@ const pulumiResources = [resource, integration, method];
 
 pulumi.all(pulumiResources)
     .apply(values => pulumi.jsonStringify(values))
-    .apply(json => console.log(json))
+    .apply(json => pulumi.log.info(json))
