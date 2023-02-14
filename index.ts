@@ -1,6 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
-import * as crypto from "crypto";
 
 const role = new aws.iam.Role("role", {
     assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal(aws.iam.Principals.LambdaPrincipal),
@@ -46,22 +45,3 @@ const pulumiResources = [resource, integration, method];
 pulumi.all(pulumiResources)
     .apply(values => pulumi.jsonStringify(values))
     .apply(json => console.log(json))
-
-
-const deployment = new aws.apigateway.Deployment("test-deployment", {
-    restApi: api.id,
-    triggers: {
-        redeployment: pulumi.all(pulumiResources)
-            .apply(values => pulumi.jsonStringify(values))
-            .apply(json => {
-                console.log(json)
-                return crypto.createHash('sha1').update(json).digest('hex')
-            }),
-    }
-    },
-    {
-        dependsOn: pulumiResources,
-        retainOnDelete: true
-    }
-)
-
